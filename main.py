@@ -24,7 +24,7 @@ def create_connection():
         connection = mysql.connector.connect(
             host='localhost',
             user='root',
-            password='GoodOmens2018',
+            password='password',
             database='bookrestaurant_db'
         )
         if connection.is_connected():
