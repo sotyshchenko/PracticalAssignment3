@@ -67,6 +67,56 @@ modify column position varchar(200) not null comment 'Position of the employee';
 select * from employees e;
 
 
+
+drop table shifts;
+
+
+create table shifts (
+    shift_id varchar(36) primary key,
+    employee_id varchar(36),
+    shift_name varchar(100),
+    start_time time,
+    end_time time,
+    foreign key (employee_id) references employees(id)
+);
+
+
+alter table shifts 
+comment = 'Table to store shifts information';
+
+alter table shifts
+modify column shift_id varchar(36) comment 'Unique identifier for each shift',
+modify column employee_id varchar(36) comment 'Unique identifier for each employee',
+modify column shift_name varchar(100) comment 'Name of the shift',
+modify column start_time time comment 'Start time of the shift',
+modify column end_time time comment 'End time of the shift';
+
+select * from shifts s;
+
+
+
+drop table salary; 
+
+create table salary 
+(
+    employee_id varchar(36) primary key,
+    salary_amount decimal(10, 2) not null,
+    salary_date date not null,
+    foreign key (employee_id) references employees(id)
+);
+
+alter table salary 
+comment = 'Table to store salary information';
+
+alter table salary
+modify column employee_id varchar(36) comment 'Unique identifier for each employee',
+modify column salary_amount decimal(10, 2) not null comment 'Amount of salary',
+modify column salary_date date not null comment 'Date of salary payment';
+
+select * from salary;
+
+
+
 drop table if exists authors;
 
 create table authors
@@ -77,7 +127,6 @@ create table authors
 	biography text
 );
 
-
 alter table authors 
 comment = 'Table to store authors information';
 
@@ -86,6 +135,9 @@ modify column id varchar(36) comment 'Unique identifier for each author',
 modify column first_name varchar(200) not null comment 'First name of the author',
 modify column last_name varchar(200) not null comment 'Last name of the author',
 modify column biography text comment 'Biography of the author';
+
+select * from authors a;
+
 
 
 drop table if exists books;
@@ -100,7 +152,6 @@ create table books
 	publication_year year not null 
 );
 	
-	
 alter table books 
 comment = 'Table to store books information';
 
@@ -111,6 +162,9 @@ modify column genre varchar(50) not null comment 'Genre of the book',
 modify column price decimal(10, 2) not null comment 'Price of the book',
 modify column isbn varchar(36) not null comment 'ISBN of the book',
 modify column publication_year year not null comment 'Publication year of the book';
+
+select * from books b;
+
 
 
 drop table if exists authors_books;
@@ -124,7 +178,6 @@ create table authors_books(
 	on delete cascade
 );
 
-
 alter table authors_books 
 comment = 'Table to store relationship between authors and books';
 
@@ -132,6 +185,8 @@ alter table authors_books
 modify column author_id varchar(36) comment 'Identifier for the author',
 modify column book_id varchar(36) comment 'Identifier for the book';
 	
+select * from authors_books ab;
+
 
 drop table book_orders;
 
@@ -159,6 +214,29 @@ modify column handled_by varchar(36) comment 'Identifier for the cashier',
 modify column order_date date comment 'Date of the book order',
 modify column status varchar(36) comment 'Status of the book order';
 
+select * from book_orders bo;
+
+
+
+drop table if exists menu_categories;
+
+create table if not exists menu_categories (
+    id varchar(36) primary key,
+    name varchar(200),
+    description text
+);
+
+alter table menu_categories 
+comment = 'Table to store menu categories';
+
+alter table menu_categories  
+modify column id varchar(36) comment 'Identifier for the menu category',
+modify column name varchar(200) comment 'Name of the menu category',
+modify column description text comment 'Decsription of the menu category';
+
+select * from menu_categories mc;
+
+
 
 drop table if exists menu;
 
@@ -169,13 +247,10 @@ create table if not exists menu (
     price decimal(10, 2) not null,
     category_id varchar(36),
     is_vegan boolean,
-    -- default false,
     is_gluten_free boolean,
-    -- default false,
     ingredients text,
     date_added date not null,
     is_available boolean,
-    -- default true,
     preparation_time int,
     calories int,
     image_url varchar(200),
@@ -184,23 +259,29 @@ create table if not exists menu (
     foreign key (category_id) references menu_categories(id)
 );
 
-select * from menu m;
-
-
 alter table menu
 comment = 'Table to store menu information';
 
+alter table menu  
+modify column id varchar(36) comment 'Identifier for the menu item',
+modify column name varchar(200) comment 'Name of the menu item',
+modify column description text comment 'Description of the menu item',
+modify column price decimal(10, 2) comment 'Price of the menu item',
+modify column category_id varchar(36) comment 'Identifier for the menu category',
+modify column is_vegan boolean comment 'Is the menu item vegan',
+modify column is_gluten_free boolean comment 'Is the menu item gluten-free',
+modify column ingredients text comment 'Ingredients of the menu item',
+modify column date_added date comment 'Date the menu item was added',
+modify column is_available boolean comment 'Is the menu item available',
+modify column preparation_time int comment 'Preparation time of the menu item',
+modify column calories int comment 'Calories of the menu item',
+modify column image_url varchar(200) comment 'Image url of the menu item',
+modify column spicy_level int comment 'Spicy level of the menu item',
+modify column allergens text comment 'Allergens of the menu item';
 
-drop table if exists menu_categories;
-
-create table if not exists menu_categories (
-    id varchar(36) primary key,
-    name varchar(200),
-    description text
-) comment 'table to store menu categories';
+select * from menu m;
 
 
-select * from menu_categories mc;
 
 drop table if exists menu_orders;
 
@@ -213,10 +294,21 @@ create table if not exists menu_orders (
     quantity int not null,
     employee_id varchar(36),
     order_status varchar(50) not null,
-    -- default 'pending',
-    -- reservation_id varchar(36),
     foreign key (customer_id) references customers(id),
     foreign key (menu_id) references menu(id),
     foreign key (employee_id) references employees(id)
-    -- foreign key (reservation_id) references reservations(id)
-) comment 'table to store customer orders for menu items, including quantity, total price, and status';
+);
+
+alter table menu_orders 
+comment = 'Table to store menu orders';
+
+alter table menu_orders
+modify column id varchar(36) comment 'Identifier for the menu order',
+modify column order_date datetime comment 'Date and time of the order',
+modify column customer_id varchar(36) comment 'Identifier for the customer',
+modify column menu_id varchar(36) comment 'Identifier for the menu item',
+modify column quantity int comment 'Quantity of the menu item ordered',
+modify column employee_id varchar(36) comment 'Identifier for the employee',
+modify column order_status varchar(50) comment 'Status of the order';
+
+select * from menu_orders mo;

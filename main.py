@@ -58,7 +58,7 @@ def insert_data():
     """
     customers_data = [
         (str(uuid.uuid4()), fake.first_name(), fake.last_name(), fake.email(), fake.phone_number(), fake.date_of_birth(minimum_age=18, maximum_age=80), random.choice([True, False]))
-        for _ in range(100)
+        for _ in range(100000)
     ]
     execute_many_queries(connection, customer_insert_query, customers_data, "customers")
 
@@ -70,9 +70,31 @@ def insert_data():
     positions = ['Manager', 'Cashier', 'Chef', 'Waiter', 'Cleaner']
     employees_data = [
         (str(uuid.uuid4()), fake.first_name(), fake.last_name(), fake.email(), fake.phone_number(), fake.date_of_birth(minimum_age=18, maximum_age=65), random.choice(positions))
-        for _ in range(20)
+        for _ in range(10000)
     ]
     execute_many_queries(connection, employee_insert_query, employees_data, "employees")
+
+    shifts_insert_query = """
+        INSERT INTO shifts (shift_id, shift_name, start_time, end_time) 
+        VALUES (%s, %s, %s, %s)
+        """
+    shifts_data = [
+        (str(uuid.uuid4()), fake.word(), fake.time(), fake.time())
+        for _ in range(30000)
+    ]
+    execute_many_queries(connection, shifts_insert_query, shifts_data, "shifts")
+
+    # Insert data into salaries table
+    salaries_insert_query = """
+        INSERT INTO salary (employee_id, salary_amount, salary_date) 
+        VALUES (%s, %s, %s)
+        """
+    salaries_data = [
+        (employee[0], round(random.uniform(1000, 10000), 2), fake.date_this_year())
+        for employee in employees_data
+    ]
+
+    execute_many_queries(connection, salaries_insert_query, salaries_data, "salary")
 
     # Insert data into authors table
     author_insert_query = """
@@ -81,7 +103,7 @@ def insert_data():
     """
     authors_data = [
         (str(uuid.uuid4()), fake.first_name(), fake.last_name(), fake.text(max_nb_chars=200))
-        for _ in range(50)
+        for _ in range(15000)
     ]
     execute_many_queries(connection, author_insert_query, authors_data, "authors")
 
@@ -93,7 +115,7 @@ def insert_data():
     genres = ['Dystopian', 'Fantasy', 'Science Fiction', 'Non-Fiction', 'Mystery']
     books_data = [
         (str(uuid.uuid4()), fake.catch_phrase(), random.choice(genres), round(random.uniform(5.99, 29.99), 2), fake.isbn13(), fake.year())
-        for _ in range(200)
+        for _ in range(400000)
     ]
     execute_many_queries(connection, book_insert_query, books_data, "books")
 
@@ -104,7 +126,7 @@ def insert_data():
     """
     authors_books_data = [
         (random.choice(authors_data)[0], random.choice(books_data)[0])
-        for _ in range(300)
+        for _ in range(40000)
     ]
     execute_many_queries(connection, authors_books_query, authors_books_data, "authors_books")
 
@@ -116,7 +138,7 @@ def insert_data():
     order_statuses = ['Completed', 'Pending', 'Cancelled']
     book_orders_data = [
         (str(uuid.uuid4()), random.choice(books_data)[0], random.choice(customers_data)[0], random.choice(employees_data)[0], fake.date_this_year(), random.choice(order_statuses))
-        for _ in range(150)
+        for _ in range(100000)
     ]
     execute_many_queries(connection, book_orders_query, book_orders_data, "book_orders")
 
