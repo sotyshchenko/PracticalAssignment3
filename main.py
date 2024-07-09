@@ -24,7 +24,7 @@ def create_connection():
         connection = mysql.connector.connect(
             host='localhost',
             user='root',
-            password='password',
+            password='GoodOmens2018',
             database='bookrestaurant_db'
         )
         if connection.is_connected():
@@ -58,7 +58,7 @@ def insert_data():
     """
     customers_data = [
         (str(uuid.uuid4()), fake.first_name(), fake.last_name(), fake.email(), fake.phone_number(), fake.date_of_birth(minimum_age=18, maximum_age=80), random.choice([True, False]))
-        for _ in range(100000)
+        for _ in range(20000)
     ]
     execute_many_queries(connection, customer_insert_query, customers_data, "customers")
 
@@ -70,17 +70,18 @@ def insert_data():
     positions = ['Manager', 'Cashier', 'Chef', 'Waiter', 'Cleaner']
     employees_data = [
         (str(uuid.uuid4()), fake.first_name(), fake.last_name(), fake.email(), fake.phone_number(), fake.date_of_birth(minimum_age=18, maximum_age=65), random.choice(positions))
-        for _ in range(10000)
+        for _ in range(5000)
     ]
     execute_many_queries(connection, employee_insert_query, employees_data, "employees")
 
+    # Insert data into shifts table
     shifts_insert_query = """
         INSERT INTO shifts (shift_id, shift_name, start_time, end_time) 
         VALUES (%s, %s, %s, %s)
         """
     shifts_data = [
         (str(uuid.uuid4()), fake.word(), fake.time(), fake.time())
-        for _ in range(30000)
+        for _ in range(10000)
     ]
     execute_many_queries(connection, shifts_insert_query, shifts_data, "shifts")
 
@@ -93,7 +94,6 @@ def insert_data():
         (employee[0], round(random.uniform(1000, 10000), 2), fake.date_this_year())
         for employee in employees_data
     ]
-
     execute_many_queries(connection, salaries_insert_query, salaries_data, "salary")
 
     # Insert data into authors table
@@ -115,7 +115,7 @@ def insert_data():
     genres = ['Dystopian', 'Fantasy', 'Science Fiction', 'Non-Fiction', 'Mystery']
     books_data = [
         (str(uuid.uuid4()), fake.catch_phrase(), random.choice(genres), round(random.uniform(5.99, 29.99), 2), fake.isbn13(), fake.year())
-        for _ in range(400000)
+        for _ in range(40000)
     ]
     execute_many_queries(connection, book_insert_query, books_data, "books")
 
@@ -138,7 +138,7 @@ def insert_data():
     order_statuses = ['Completed', 'Pending', 'Cancelled']
     book_orders_data = [
         (str(uuid.uuid4()), random.choice(books_data)[0], random.choice(customers_data)[0], random.choice(employees_data)[0], fake.date_this_year(), random.choice(order_statuses))
-        for _ in range(100000)
+        for _ in range(500000)
     ]
     execute_many_queries(connection, book_orders_query, book_orders_data, "book_orders")
 
@@ -152,8 +152,6 @@ def insert_data():
         (str(uuid.uuid4()), name, fake.text(max_nb_chars=100))
         for name in category_names
     ]
-    execute_many_queries(connection, menu_categories_query, menu_categories_data, "menu_categories")
-
     execute_many_queries(connection, menu_categories_query, menu_categories_data, "menu_categories")
 
     # Insert data into menu table
@@ -175,7 +173,7 @@ def insert_data():
     """
     menu_orders_data = [
         (str(uuid.uuid4()), fake.date_time_this_year(), random.choice(customers_data)[0], random.choice(menu_data)[0], random.randint(1, 10), random.choice(employees_data)[0], random.choice(order_statuses))
-        for _ in range(200)
+        for _ in range(20000)
     ]
     execute_many_queries(connection, menu_orders_query, menu_orders_data, "menu_orders")
 
