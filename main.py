@@ -24,7 +24,7 @@ def create_connection():
         connection = mysql.connector.connect(
             host='localhost',
             user='root',
-            password='GoodOmens2018',
+            password='password',
             database='bookrestaurant_db'
         )
         if connection.is_connected():
@@ -76,12 +76,18 @@ def insert_data():
 
     # Insert data into shifts table
     shifts_insert_query = """
-        INSERT INTO shifts (shift_id, shift_name, start_time, end_time) 
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO shifts (shift_id, employee_id, shift_name, start_time, end_time) 
+        VALUES (%s, %s, %s, %s, %s)
         """
+    employee_ids = [employee[0] for employee in employees_data]
     shifts_data = [
-        (str(uuid.uuid4()), fake.word(), fake.time(), fake.time())
+        (str(uuid.uuid4()), random.choice(employee_ids), fake.word(),
+         f"{start_hour:02d}:{random.randint(0, 59):02d}:{random.randint(0, 59):02d}",
+         f"{end_hour:02d}:{random.randint(0, 59):02d}:{random.randint(0, 59):02d}"
+         )
         for _ in range(10000)
+        for start_hour in [random.randint(0, 20)]
+        for end_hour in [random.randint(start_hour + 3, 23)]
     ]
     execute_many_queries(connection, shifts_insert_query, shifts_data, "shifts")
 
@@ -138,7 +144,7 @@ def insert_data():
     order_statuses = ['Completed', 'Pending', 'Cancelled']
     book_orders_data = [
         (str(uuid.uuid4()), random.choice(books_data)[0], random.choice(customers_data)[0], random.choice(employees_data)[0], fake.date_this_year(), random.choice(order_statuses))
-        for _ in range(500000)
+        for _ in range(300000)
     ]
     execute_many_queries(connection, book_orders_query, book_orders_data, "book_orders")
 

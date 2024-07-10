@@ -17,7 +17,7 @@ create table if not exists customers
 	email varchar(200) not null,
 	phone varchar(50) not null,
 	birth_date date,
-	regular boolean
+	regular boolean not null default false
 );
 
 
@@ -47,7 +47,7 @@ create table if not exists employees
 	last_name varchar(200) not null,
 	email varchar(200) not null,
 	phone varchar(50) not null,
-	birth_date date,
+	birth_date date not null,
 	position varchar(200) not null
 );
 
@@ -68,16 +68,17 @@ select * from employees e;
 
 
 
-drop table shifts;
+drop table if exists shifts;
 
 
-create table shifts (
+create table if not exists shifts (
     shift_id varchar(36) primary key,
     employee_id varchar(36),
-    shift_name varchar(100),
-    start_time time,
-    end_time time,
-    foreign key (employee_id) references employees(id)
+    shift_name varchar(100) not null,
+    start_time time not null,
+    end_time time not null,
+    foreign key (employee_id) references employees(id),
+    check (start_time < end_time)
 );
 
 
@@ -95,14 +96,15 @@ select * from shifts s;
 
 
 
-drop table salary; 
+drop table if exists salary; 
 
-create table salary 
+create table if not exists salary 
 (
     employee_id varchar(36) primary key,
     salary_amount decimal(10, 2) not null,
     salary_date date not null,
-    foreign key (employee_id) references employees(id)
+    foreign key (employee_id) references employees(id),
+    check (salary_amount > 0)
 );
 
 alter table salary 
@@ -149,7 +151,8 @@ create table books
 	genre varchar(50) not null,
 	price decimal(10, 2) not null,
 	isbn varchar(36) not null,
-	publication_year year not null 
+	publication_year year not null,
+	check (price > 0)
 );
 	
 alter table books 
@@ -193,11 +196,11 @@ drop table book_orders;
 create table book_orders
 (
 	id varchar(36) primary key,
-	book_id varchar(36), 
-	customer_id varchar(36),
-	handled_by varchar(36),
+	book_id varchar(36) not null, 
+	customer_id varchar(36) not null,
+	handled_by varchar(36) not null,
 	order_date date not null,
-	status varchar(36),
+	status varchar(36) not null,
 	foreign key (customer_id) references customers(id),
 	foreign key (book_id) references books(id),
 	foreign key (handled_by) references employees(id)
@@ -246,17 +249,21 @@ create table if not exists menu (
     description text,
     price decimal(10, 2) not null,
     category_id varchar(36),
-    is_vegan boolean,
-    is_gluten_free boolean,
+    is_vegan boolean not null default false,
+    is_gluten_free boolean not null default false,
     ingredients text,
     date_added date not null,
-    is_available boolean,
+    is_available boolean not null default true,
     preparation_time int,
     calories int,
     image_url varchar(200),
     spicy_level int,
     allergens text,
-    foreign key (category_id) references menu_categories(id)
+    foreign key (category_id) references menu_categories(id),
+    check (price > 0),
+    check (preparation_time >= 0),
+    check (calories >= 0),
+    check (spicy_level >= 0)
 );
 
 alter table menu
@@ -296,7 +303,8 @@ create table if not exists menu_orders (
     order_status varchar(50) not null,
     foreign key (customer_id) references customers(id),
     foreign key (menu_id) references menu(id),
-    foreign key (employee_id) references employees(id)
+    foreign key (employee_id) references employees(id),
+    check (quantity > 0)
 );
 
 alter table menu_orders 
